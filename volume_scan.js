@@ -133,7 +133,7 @@ body {
 }
 
 .date {
-  font-size: 24px;
+  font-size: 14px;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -180,9 +180,17 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+/* MOBILE HORIZONTAL SCROLL FIX */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 640px; /* ensures horizontal scroll on small screens */
 }
 
 th, td {
@@ -229,7 +237,7 @@ td.volume {
 <div class="container">
 
   <div class="title-row">
-    <h1>Daily Volume Spikes - NIFTY 50</h1>
+    <h1>Daily Volume Spikes — NIFTY 50</h1>
     <div class="date">${updatedDate}</div>
   </div>
 
@@ -254,19 +262,21 @@ td.volume {
       Volume Ratio = Today’s volume ÷ 20-day average volume
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Stock</th>
-          <th style="text-align:right;">Volume Ratio</th>
-          <th style="text-align:right;">Today’s Volume</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Stock</th>
+            <th style="text-align:right;">Volume Ratio</th>
+            <th style="text-align:right;">Today’s Volume</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="footer">
