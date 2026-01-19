@@ -54,7 +54,16 @@ run();
 function saveToHTML(results) {
   const now = new Date();
   const date = now.toISOString().split("T")[0];
-  const time = now.toLocaleTimeString();
+  const time = now.toLocaleTimeString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
 
   const rows = results
     .map(
@@ -248,7 +257,7 @@ function saveToHTML(results) {
           </div>
 
           <div class="meta">
-            Generated on: ${date}, ${time} IST
+            Generated on: ${time} IST
           </div>
         </div>
 
