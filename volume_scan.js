@@ -236,7 +236,7 @@ function saveToHTML(results) {
               This page shows daily NIFTY 50 stocks with unusual trading volume, updated after market close.
             </p>
             <p>
-              If you find this useful, support continued daily updates for ₹49/month (early supporter price).
+              If you find this useful, support continued daily updates for ₹49 (early supporter price).
             </p>
             <p>
               👉 Support here: <a href="https://rzp.io/rzp/WF8Nxfql" target="_blank" rel="noopener noreferrer">
