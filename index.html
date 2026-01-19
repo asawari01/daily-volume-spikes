@@ -14,6 +14,8 @@
           --muted: #9ca3af;
           --border: #1f2933;
           --accent: #22c55e;
+          --highlight: #38bdf8;
+          --callout-bg: #020617;
         }
 
         * {
@@ -44,10 +46,41 @@
           font-weight: 600;
         }
 
-        .subtitle {
-          margin-top: 6px;
+        .open-access {
+          margin-top: 16px;
+          padding: 16px 18px;
+          border-radius: 10px;
+          background: var(--callout-bg);
+          border: 1px solid var(--border);
+        }
+
+        .open-access h2 {
+          margin: 0 0 8px 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--highlight);
+        }
+
+        .open-access p {
+          margin: 6px 0;
           font-size: 14px;
-          color: var(--muted);
+          color: var(--text);
+        }
+
+        .open-access a {
+          color: #60a5fa;  
+          text-decoration: underline;
+          font-weight: 500;
+        }
+
+        .open-access a:hover {
+          color: #93c5fd;
+        }
+
+        .subtitle {
+          margin-top: 16px;
+          font-size: 14px;
+          color: var(--highlight);
         }
 
         .meta {
@@ -84,7 +117,7 @@
           text-transform: uppercase;
           letter-spacing: 0.05em;
           font-size: 12px;
-          color: var(--muted);
+          color: var(--highlight);
           border-bottom: 1px solid var(--border);
         }
 
@@ -119,6 +152,24 @@
         <div class="header">
           <h1>Daily Volume Spikes — NIFTY 50</h1>
 
+          <div class="open-access">
+            <h2>🔓 Currently open access</h2>
+            <p>
+              This page shows daily NIFTY 50 stocks with unusual trading volume, updated after market close.
+            </p>
+            <p>
+              If you find this useful, support continued daily updates for ₹49/month (early supporter price).
+            </p>
+            <p>
+              👉 Support here: <a href="https://rzp.io/rzp/WF8Nxfql" target="_blank" rel="noopener noreferrer">
+                https://rzp.io/rzp/WF8Nxfql
+              </a>
+            </p>
+            <p>
+              (Price may increase as features and coverage expand.)
+            </p>
+          </div>
+
           <div class="subtitle">
             Identifies NIFTY 50 stocks showing unusually high trading volume compared to their recent average.
           </div>
@@ -128,7 +179,7 @@
           </div>
 
           <div class="meta">
-            Generated on: 2026-01-19, 6:00:39 pm IST
+            Generated on: 2026-01-19, 7:46:13 pm IST
           </div>
         </div>
 
