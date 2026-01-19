@@ -2,8 +2,11 @@ name: Daily Volume Update
 
 on:
   schedule:
-    - cron: "30 11 * * 1-5" # 5:00 PM IST (11:30 UTC), Mon–Fri
+    - cron: "5 10 * * 1-5" # 5:00 PM IST (11:30 UTC), Mon–Fri
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update:
