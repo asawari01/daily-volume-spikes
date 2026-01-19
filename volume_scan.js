@@ -20,7 +20,7 @@ async function run() {
         interval: "1d",
       });
 
-      const quotes = result.quotes.filter((q) => q.volume != null);
+      const quotes = result.quotes.filter(q => q.volume != null);
       if (quotes.length < 21) continue;
 
       const todayVolume = quotes[quotes.length - 1].volume;
@@ -80,7 +80,7 @@ function saveToHTML(results) {
           <td class="stock">${r.symbol}</td>
           <td class="ratio">${r.ratio.toFixed(2)}</td>
           <td class="volume">${formatVolume(r.volume)}</td>
-        </tr>`,
+        </tr>`
     )
     .join("");
 
@@ -107,7 +107,7 @@ function saveToHTML(results) {
 
 body {
   margin: 0;
-  padding: 32px;
+  padding: 24px;
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -165,12 +165,12 @@ body {
   text-decoration: underline;
 }
 
+/* IMPORTANT: NO overflow hidden here */
 .card {
   margin-top: 24px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  overflow: hidden;
 }
 
 .explain {
@@ -180,7 +180,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-/* MOBILE HORIZONTAL SCROLL FIX */
+/* MOBILE SCROLL FIX */
 .table-wrap {
   width: 100%;
   overflow-x: auto;
@@ -189,8 +189,8 @@ body {
 
 table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
-  min-width: 640px; /* ensures horizontal scroll on small screens */
 }
 
 th, td {
@@ -243,51 +243,4 @@ td.volume {
 
   <div class="time">Updated at ${updatedTime} IST</div>
 
-  <div class="subtitle">
-    Stocks showing unusually high trading volume compared to their recent average.
-  </div>
-
-  <div class="support">
-    This page is open access and updated daily after market close.
-    If you find it useful, you may support its maintenance with a
-    <strong>one-time ₹99 support fee</strong>.
-    <br />
-    <a href="https://rzp.io/rzp/WF8Nxfql" target="_blank" rel="noopener noreferrer">
-      Support this project
-    </a>
-  </div>
-
-  <div class="card">
-    <div class="explain">
-      Volume Ratio = Today’s volume ÷ 20-day average volume
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Stock</th>
-            <th style="text-align:right;">Volume Ratio</th>
-            <th style="text-align:right;">Today’s Volume</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="footer">
-    Data source: Yahoo Finance<br />
-    For informational purposes only. Not investment advice.
-  </div>
-
-</div>
-</body>
-</html>
-`;
-
-  fs.writeFileSync("index.html", html);
-}
+  <div class="subtitle"
