@@ -1,4 +1,4 @@
-//import yahoo
+// import dependencies
 import fs from "fs";
 import YahooFinance from "yahoo-finance2";
 
@@ -6,7 +6,7 @@ const yahooFinance = new YahooFinance({
   suppressNotices: ["ripHistorical"],
 });
 
-// define symbols
+// load symbols
 const symbols = JSON.parse(fs.readFileSync("symbols.json", "utf-8"));
 
 async function run() {
@@ -23,265 +23,261 @@ async function run() {
       const quotes = result.quotes.filter((q) => q.volume != null);
       if (quotes.length < 21) continue;
 
-      const today = quotes[quotes.length - 1].volume;
+      const todayVolume = quotes[quotes.length - 1].volume;
       const last20 = quotes.slice(-21, -1);
       const avg20 =
         last20.reduce((sum, q) => sum + q.volume, 0) / last20.length;
 
-      const ratio = today / avg20;
+      const ratio = todayVolume / avg20;
 
       results.push({
         symbol,
         ratio,
+        volume: todayVolume,
       });
-    } catch (err) {
-      console.error(`Error for ${symbol}`);
+    } catch {
+      console.error(`Error fetching ${symbol}`);
     }
   }
 
   results.sort((a, b) => b.ratio - a.ratio);
-
-  console.log("\nTop Volume Spikes:");
-  results.slice(0, 10).forEach((r, i) => {
-    console.log(`${i + 1}. ${r.symbol} | Volume Ratio: ${r.ratio.toFixed(2)}`);
-  });
-
   saveToHTML(results.slice(0, 10));
 }
 
 run();
 
+// ---------------- HTML GENERATION ----------------
+
+function formatVolume(v) {
+  if (v >= 1e7) return (v / 1e7).toFixed(1) + " Cr";
+  if (v >= 1e6) return (v / 1e6).toFixed(1) + " M";
+  if (v >= 1e3) return (v / 1e3).toFixed(1) + " K";
+  return v.toString();
+}
+
 function saveToHTML(results) {
   const now = new Date();
-  const date = now.toISOString().split("T")[0];
-  const time = now.toLocaleTimeString("en-IN", {
+
+  const updatedDate = now.toLocaleDateString("en-IN", {
     timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
     day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  const updatedTime = now.toLocaleTimeString("en-IN", {
+    timeZone: "Asia/Kolkata",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
     hour12: true,
   });
 
   const rows = results
     .map(
-      (r, i) =>
-        `<tr>
+      (r, i) => `
+        <tr>
           <td>${i + 1}</td>
-          <td class="symbol">${r.symbol}</td>
+          <td class="stock">${r.symbol}</td>
           <td class="ratio">${r.ratio.toFixed(2)}</td>
+          <td class="volume">${formatVolume(r.volume)}</td>
         </tr>`,
     )
     .join("");
 
   const html = `
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Daily Volume Spikes — NIFTY 50</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Volume Spikes — NIFTY 50</title>
 
-      <style>
-        :root {
-          --bg: #0f172a;
-          --card: #111827;
-          --text: #e5e7eb;
-          --muted: #9ca3af;
-          --border: #1f2933;
-          --accent: #22c55e;
-          --highlight: #38bdf8;
-          --callout-bg: #020617;
-        }
+<style>
+:root {
+  --bg: #020617;
+  --card: #0b1220;
+  --border: #1e293b;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #38bdf8;
+  --ratio: #22c55e;
+}
 
-        * {
-          box-sizing: border-box;
-        }
+* { box-sizing: border-box; }
 
-        body {
-          margin: 0;
-          padding: 32px;
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-            Roboto, sans-serif;
-          background: #020617;
-          color: var(--text);
-        }
+body {
+  margin: 0;
+  padding: 32px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+}
 
-        .container {
-          max-width: 900px;
-          margin: auto;
-        }
+.container {
+  max-width: 900px;
+  margin: auto;
+}
 
-        .header {
-          margin-bottom: 24px;
-        }
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
 
-        .header h1 {
-          margin: 0;
-          font-size: 28px;
-          font-weight: 600;
-        }
+.title-row h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
 
-        .open-access {
-          margin-top: 16px;
-          padding: 16px 18px;
-          border-radius: 10px;
-          background: var(--callout-bg);
-          border: 1px solid var(--border);
-        }
+.date {
+  font-size: 24px;
+  color: var(--muted);
+  white-space: nowrap;
+}
 
-        .open-access h2 {
-          margin: 0 0 8px 0;
-          font-size: 16px;
-          font-weight: 600;
-          color: var(--highlight);
-        }
+.time {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--accent);
+}
 
-        .open-access p {
-          margin: 6px 0;
-          font-size: 14px;
-          color: var(--text);
-        }
+.subtitle {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--accent);
+}
 
-        .open-access a {
-          color: #60a5fa;  
-          text-decoration: underline;
-          font-weight: 500;
-        }
+.support {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+}
 
-        .open-access a:hover {
-          color: #93c5fd;
-        }
+.support a {
+  color: var(--accent);
+  text-decoration: underline;
+}
 
-        .subtitle {
-          margin-top: 16px;
-          font-size: 14px;
-          color: var(--highlight);
-        }
+.card {
+  margin-top: 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
 
-        .meta {
-          margin-top: 8px;
-          font-size: 12px;
-          color: var(--muted);
-        }
+.explain {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
 
-        .card {
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
+th, td {
+  padding: 14px 16px;
+  font-size: 14px;
+}
 
-        thead {
-          background: rgba(255, 255, 255, 0.03);
-        }
+th {
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
 
-        th,
-        td {
-          padding: 14px 16px;
-          text-align: left;
-          font-size: 14px;
-        }
+td {
+  border-bottom: 1px solid var(--border);
+}
 
-        th {
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          font-size: 12px;
-          color: var(--highlight);
-          border-bottom: 1px solid var(--border);
-        }
+td.stock {
+  font-weight: 600;
+}
 
-        tbody tr {
-          border-bottom: 1px solid var(--border);
-          transition: background 0.15s ease;
-        }
+td.ratio {
+  color: var(--ratio);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-align: right;
+}
 
-        tbody tr:hover {
-          background: rgba(255, 255, 255, 0.04);
-        }
+td.volume {
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--muted);
+}
 
-        td.symbol {
-          font-weight: 600;
-        }
+.footer {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+</style>
+</head>
 
-        td.ratio {
-          font-weight: 600;
-          color: var(--accent);
-        }
+<body>
+<div class="container">
 
-        .footer {
-          margin-top: 16px;
-          font-size: 12px;
-          color: var(--muted);
-        }
-      </style>
-    </head>
+  <div class="title-row">
+    <h1>Daily Volume Spikes - NIFTY 50</h1>
+    <div class="date">${updatedDate}</div>
+  </div>
 
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>Daily Volume Spikes — NIFTY 50</h1>
+  <div class="time">Updated at ${updatedTime} IST</div>
 
-          <div class="open-access">
-            <h2>🔓 Open access</h2>
-            <p>
-              This page shows daily NIFTY 50 stocks with unusual trading volume, updated after market close.
-            </p>
-            <p>
-              If you find this useful, support continued daily updates for ₹49 one time support fee.
-            </p>
-            <p>
-              👉 Support here: <a href="https://rzp.io/rzp/WF8Nxfql" target="_blank" rel="noopener noreferrer">
-                https://rzp.io/rzp/WF8Nxfql
-              </a>
-            </p>
-          </div>
+  <div class="subtitle">
+    Stocks showing unusually high trading volume compared to their recent average.
+  </div>
 
-          <div class="subtitle">
-            Identifies NIFTY 50 stocks showing unusually high trading volume compared to their recent average.
-          </div>
+  <div class="support">
+    This page is open access and updated daily after market close.
+    If you find it useful, you may support its maintenance with a
+    <strong>one-time ₹99 support fee</strong>.
+    <br />
+    <a href="https://rzp.io/rzp/WF8Nxfql" target="_blank" rel="noopener noreferrer">
+      Support this project
+    </a>
+  </div>
 
-          <div class="meta">
-            Universe: NIFTY 50 constituents • Updated daily after market close
-          </div>
+  <div class="card">
+    <div class="explain">
+      Volume Ratio = Today’s volume ÷ 20-day average volume
+    </div>
 
-          <div class="meta">
-            Generated on: ${time} IST
-          </div>
-        </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Stock</th>
+          <th style="text-align:right;">Volume Ratio</th>
+          <th style="text-align:right;">Today’s Volume</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  </div>
 
-        <div class="card">
-          <table>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Symbol</th>
-                <th>Volume Ratio</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-            </tbody>
-          </table>
-        </div>
+  <div class="footer">
+    Data source: Yahoo Finance<br />
+    For informational purposes only. Not investment advice.
+  </div>
 
-        <div class="footer">
-          This list highlights unusual trading activity based on volume.
-          <br />
-          For informational purposes only. Not investment advice.
-        </div>
-      </div>
-    </body>
-  </html>
-  `;
+</div>
+</body>
+</html>
+`;
 
   fs.writeFileSync("index.html", html);
 }
